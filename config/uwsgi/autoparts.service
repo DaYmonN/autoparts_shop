@@ -1,0 +1,20 @@
+[Unit]
+Description=uWSGI service for autoparts_shop Django project
+After=network.target mysql.service
+Requires=mysql.service
+
+[Service]
+Type=forking
+User=dmitry
+Group=dmitry
+WorkingDirectory=/home/dmitry/autoparts_project
+Environment="PATH=/home/dmitry/autoparts_project/venv/bin"
+ExecStart=/home/dmitry/autoparts_project/venv/bin/uwsgi --ini /home/dmitry/autoparts_project/config/uwsgi/autoparts.ini
+ExecStop=/usr/bin/pkill -f uwsgi
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGQUIT
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

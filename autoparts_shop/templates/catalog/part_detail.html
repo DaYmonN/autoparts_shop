@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ part.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                {% if part.image %}
+                    <img src="{{ part.image.url }}" class="img-fluid" alt="{{ part.name }}" style="max-height: 400px;">
+                {% else %}
+                    <i class="bi bi-wrench display-1 text-secondary"></i>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title h2 mb-3">{{ part.name }}</h1>
+
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="35%"><i class="bi bi-upc-scan"></i> Артикул:</th>
+                        <td>{{ part.article }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-tag"></i> Марка авто:</th>
+                        <td>{{ part.brand.name }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-folder"></i> Категория:</th>
+                        <td>{{ part.get_category_display }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-cash"></i> Цена:</th>
+                        <td class="h3 text-danger">{{ part.price }} ₽</td>
+                    </tr>
+                    <tr>
+                        <th><i class="bi bi-box"></i> Наличие:</th>
+                        <td>
+                            {% if part.stock > 0 %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> В наличии ({{ part.stock }} шт.)
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Нет в наличии
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if part.compatibility %}
+                    <tr>
+                        <th><i class="bi bi-car-front"></i> Совместимость:</th>
+                        <td>{{ part.compatibility }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+
+                <div class="alert alert-secondary mt-3">
+                    <h5><i class="bi bi-info-circle"></i> Описание:</h5>
+                    <p class="mb-0">{{ part.description }}</p>
+                </div>
+
+                <div class="mt-4">
+                    {% if part.stock > 0 %}
+                        <a href="{% url 'cart:add_to_cart' part.id %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cart-plus"></i> Добавить в корзину
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'catalog:catalog' %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Назад в каталог
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
