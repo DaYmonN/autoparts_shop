@@ -319,17 +319,47 @@ python manage.py startapp app_name
 2. Настройте ALLOWED_HOSTS = ['ваш-домен.com']
 3. Используйте переменные окружения для секретных ключей
 4. Настройте HTTPS (SSL/TLS)
-5. Используйте Gunicorn или uWSGI вместо runserver
-6. Настройте Nginx/Apache как прокси-сервер
-7. Настройте регулярные резервные копии базы данных
+5. Используйте uWSGI + Nginx
+6. Настройте регулярные резервные копии базы данных
 
-Пример настройки для production:
+Пример настройки для production (nginx + uWSGI):
 
-# Установка Gunicorn:
-pip install gunicorn
+# Конфигурация uWSGI (файл uwsgi.ini):
+[uwsgi]
+chdir = /путь/к/проекту
+module = autoparts_shop.wsgi:application
+home = /путь/к/venv
+master = true
+processes = 4
+socket = /путь/к/проекту/autoparts.sock
+chmod-socket = 666
+vacuum = true
 
-# Запуск через Gunicorn:
-gunicorn autoparts_shop.wsgi:application --bind 0.0.0.0:8000
+# Конфигурация nginx (/etc/nginx/sites-available/autoparts):
+server {
+    listen 8000;
+    server_name localhost;
+    
+    location /static/ {
+        alias /путь/к/проекту/staticfiles/;
+    }
+    
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:///путь/к/проекту/autoparts.sock;
+    }
+}
+
+# Запуск uWSGI:
+uwsgi --ini uwsgi.ini --daemonize=/tmp/uwsgi.log
+
+# Запуск nginx:
+sudo systemctl restart nginx
+
+Конфигурационные файлы находятся в папке config/:
+- config/nginx/autoparts.conf - настройки nginx
+- config/uwsgi/autoparts.ini - настройки uWSGI
+- config/uwsgi/autoparts.service - systemd сервис
 
 ================================================================================
 9. ПОЛЕЗНЫЕ ССЫЛКИ
